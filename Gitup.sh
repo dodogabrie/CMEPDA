@@ -1,4 +1,6 @@
 #!/bin/bash
+# Descrizione:
+# File che permette il caricamento su GitHub di tutti i file in questa cartella.
 echo 'Adding..'
 git add *
 echo 'Commit message:'
