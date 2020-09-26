@@ -1,6 +1,8 @@
 #!/bin/bash
 echo 'Adding..'
 git add *
-git commit -m "$1"
-echo 'pushing'
+echo 'Commit message:'
+read text
+git commit -m "$text"
+echo 'pushing files..'
 git push origin master
