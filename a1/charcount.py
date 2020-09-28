@@ -19,10 +19,9 @@ def process(file_path):
     # Open the input file (note that we are taking advantage of context
     # management, using a with statement).
     logging.info('Opening input file "%s"', file_path)
-with open(file_path) as input_file:        # Apre e chiude file  
+    with open(file_path) as input_file:             # Apre e chiude file  
         data = input_file.read()
     logging.info('Done. %d character(s) found.', len(data))
-
     # Prepare a dictionary to hold the letter frequencies, and initialize
     # all the counts to zero.
     letters = 'abcdefghijklmnopqrstuvwxyz'
