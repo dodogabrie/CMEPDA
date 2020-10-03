@@ -11,32 +11,40 @@ logging.basicConfig(level=logging.INFO)         # Definisce il livello di log
 _description = 'Measure the releative frequencies of letters in a text file'
 
 
-def print_res(ch,freq_dict,istogram):
-    i = 0
-    letters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-    vec=np.zeros(len(freq_dict.values()))
-    # Stampa le percentuali, un istogramma ascii e scrive dentro a vec i valori percentuali
-    for ch, freq in freq_dict.items():
-        letters[i]=ch
-        vec[i]=freq*100.
-        i+=1
-        if freq*100. < 10:
-            print('{}: {:.3f}% '.format(ch, freq*100. ), '#'*math.ceil( freq*100. - 0.5 ))
-        else:
-            print('{}: {:.3f}%'.format(ch, freq*100. ), '#'*math.ceil( freq*100. - 0.5 ))
-    if istogram == 'y':
+def istogram(yn,freq_dict):
+    if yn == 'y':                               # Evito di eseguire se non serve
+        letters = []                            # Inizializzo vuoti, riempio nel
+        vec = []                                #   loop scorrendo il dizionario
+
+        # Riempie i miei vettori per il plot scorrendo il dizionario.
+        for ch, freq in freq_dict.items():
+            letters.append(ch)
+            vec = np.append(vec,freq*100)
+
         # stampa l'istogramma su volontà dell'utente.
         plt.bar(letters, height=vec)
         plt.grid(axis='y', alpha=0.75)
         plt.xlabel('Value')
         plt.ylabel('Frequency')
-        plt.title('My Very Own Histogram')
+        plt.title('Letters Frequencies')
         maxfreq = vec.max()
         plt.ylim(ymax=maxfreq+1)
         plt.show()
+    else:
+        return
 
-def process(file_path,istogram):
-    start = time.time()                         # Star measuring time
+
+def print_res(freq_dict):
+    # Stampa le percentuali, un istogramma ascii e scrive dentro a vec i valori percentuali
+    for ch, freq in freq_dict.items():
+        if freq*100. < 10:
+            #   lettera: perc                   esempio: 5% = #####, la funzione ceil arrotonda.
+            print('{}: {:.3f}% '.format(ch, freq*100.), '#'*math.ceil( freq*100. - 0.5 ))
+        else:
+            print('{}: {:.3f}%'.format(ch, freq*100.), '#'*math.ceil( freq*100. - 0.5 ))
+
+def process(file_path,inst):
+    start = time.time()                         # Start measuring time
     """Main processing method.
     """
     # Basic sanity check: make sure that the file_argument points to an
@@ -70,14 +78,15 @@ def process(file_path,istogram):
 
     # We're done---print the glorious output. (And here it is appropriate to
     # use print() instead of logging.)
+    print_res(freq_dict)                        # Print Result with ascii istogram
     end = time.time()                           # Stop measuring time
-    print_res(ch, freq_dict,istogram)        # Print Result with ascii istogram
-    print('Elapsed time: %f' % (end-start))     # Print the elapsed time
+    istogram(inst,freq_dict)                      # Print Instrogram from matplotlib
+    logging.info('Elapsed Time: %f sec', end-start)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=_description)
     parser.add_argument('infile', help='path to the input file')
-    parser.add_argument('istogram', help='adding mathplot istogram [y/n]')
+    parser.add_argument('--inst', type=str , default='n', help='add matplot istogram [y/n]')
     args = parser.parse_args()
-    process(args.infile,args.istogram)
+    process(args.infile,args.inst)
