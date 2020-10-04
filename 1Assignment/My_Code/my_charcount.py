@@ -2,34 +2,44 @@ import os                                       # Manipulate path of my PC
 import argparse                                 # Make --help description
 import logging                                  # Make Debug and Warning 
 import time                                     # Misure time of process
-import book_features
+# Don't forget to put in the same folder the file 'book_features.py'
+import book_features                            # Add my features
+
 logging.basicConfig(level=logging.INFO)         # Definisce il livello di log
 
 _description = 'Measure the releative frequencies of letters in a text file'
 
-def process(file_path,inst,sk,stats):
+def extract(file_path,skip):
+    """ Extract the text from .txt file.
+    """
+    logging.info('Opening input file "%s"', file_path)
+    with open(file_path) as input_file:         # Apro il file di testo con il libro
+        data_raw = input_file.read()
+        if skip:                                # Estraggo i caratteri che mi servono.
+            start_string = '*** START OF THIS PROJECT GUTENBERG EBOOK CHIMERA WORLD ***'
+            end_string = '*** END OF THIS PROJECT GUTENBERG EBOOK CHIMERA WORLD ***'
+            start = data_raw.find(start_string) + len(start_string) 
+            stop = data_raw.find(end_string)
+            data_body = data_raw[start:stop]
+    logging.info('Done. %d character(s) found.', len(data_raw))
+    if skip:
+        logging.info('Extracted the body of %d character(s).', len(data_body))
+    return data_body
+
+def process(file_path,ist,body,stats):
     """Main processing method.
     """
     start = time.time()                         # Start measuring time
-
     ##################
     #  Sanity check  #
     ##################
     assert file_path.endswith('.txt'), "Not a txt file"
     assert os.path.isfile(file_path), "Wrong path"
-    test_inst = (inst == "y" or inst == "n")            # 3 test per i parametri 
-    test_sk = (sk == "y" or sk == "n")                  #   che richiedono
-    test_stats = (stats == "y" or stats == "n")         #       y/n
-    assert  test_inst and test_sk and test_stats, "Can insert only y/n"
 
-    ###############
-    #  Open File  #
-    ###############
-    data = book_features.extract(file_path,sk)
-
-    ############################
-    #  Prepare the dictionary  #
-    ############################
+    ##########################################
+    #  Open file and prepare the dictionary  #
+    ##########################################
+    data = extract(file_path,body)              # Extract from the file .txt the book
     letters = 'abcdefghijklmnopqrstuvwxyz'      # Lettere da analizzare
     freq_dict = {}                              # Dizionario
     for ch in letters:                          # Inizializzo a zero tutto
@@ -47,17 +57,19 @@ def process(file_path,inst,sk,stats):
     #  Print the results  #
     #######################
     book_features.print_freq(freq_dict)         # Print Result with ascii istogram
-    book_features.print_stats(data,stats)       # Print the stats of the book
+    if body:
+        book_features.print_stats(data)         # Print the stats of the book
     end = time.time()                           # Stop measuring time
-    book_features.istogram(inst,freq_dict)      # Print Instrogram from matplotlib
+    if ist:
+        book_features.istogram(freq_dict)      # Print Instrogram from matplotlib
     logging.info('Elapsed Time: %f sec', end-start)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=_description)
     parser.add_argument('infile', help='path to the input file')
-    parser.add_argument('--inst', type=str , default='n', help='Add matplot istogram [y/n]')
-    parser.add_argument('--skip', type=str , default='n', help='Skip preamble and license [y/n]')
-    parser.add_argument('--stats', type=str , default='n', help='Print basic book stats [y/n]')
+    parser.add_argument('-i', '--ist' , help='Add matplot istogram', action='store_true')
+    parser.add_argument('-b', '--body' , help='Extract the body of the book', action='store_true')
+    parser.add_argument('-s', '--stats', help='Print basic book stats', action='store_true')
     args = parser.parse_args()
-    process(args.infile,args.inst,args.skip,args.stats)
+    process(args.infile,args.ist,args.body,args.stats)
