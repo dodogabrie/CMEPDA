@@ -16,8 +16,6 @@ def process(file_path):
     assert file_path.endswith('.txt')
     assert os.path.isfile(file_path)
 
-    # Open the input file (note that we are taking advantage of context
-    # management, using a with statement).
     logging.info('Opening input file "%s"', file_path)
     with open(file_path) as input_file:             # Apre e chiude file  
         data = input_file.read()
