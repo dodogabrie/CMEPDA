@@ -3,39 +3,41 @@
 """
 import os                                       # Manipulate path of my PC
 import argparse                                 # Make --help description
-import logging                                  # Make Debug and Warning 
+import logging                                  # Make Debug and Warning
 import time                                     # Misure time of process
+import string
 # Don't forget to put in the same folder the file 'book_features.py'
 import book_features                            # Add my features
-import string
 
 logging.basicConfig(level=logging.INFO)         # Definisce il livello di log
 # Potrebbe essere .DEBUG
 
 
-_description = 'Measure the releative frequencies of letters in a text file'
+_DESCRIPTION = 'Measure the releative frequencies of letters in a text file'
 
 def extract(file_path, body):
     """ Extract the text from .txt file.
     """
-    logging.info('Opening input file "%s"', file_path)  # Si usa la virgola perché non formatta sempre: 
+    logging.info('Opening input file "%s"', file_path)  # Si usa la virgola perché
+                                                        #non formatta sempre:
                                                         # se non stampa non formatta.
     with open(file_path) as input_file:         # Apro il file di testo con il libro
         data_raw = input_file.read()
         if body:                                # Estraggo i caratteri che mi servono.
             start_string = '*** START OF THIS PROJECT GUTENBERG EBOOK CHIMERA WORLD ***'
             end_string = '*** END OF THIS PROJECT GUTENBERG EBOOK CHIMERA WORLD ***'
-            start = data_raw.find(start_string) + len(start_string) 
+            start = data_raw.find(start_string) + len(start_string)
             stop = data_raw.find(end_string)
             data_body = data_raw[start:stop]
     logging.info('Done. %d character(s) found.', len(data_raw))
     if body:
         logging.info('Extracted the body of %d character(s).', len(data_body))
-        return data_body
+        data_out = data_body
     else:
-        return data_raw
+        data_out = data_raw
+    return data_out
 
-def process(file_path,ist,body,stats):
+def process(file_path, ist, body, stats):
     """Main processing method.
     """
     start = time.time()                         # Start measuring time
@@ -56,13 +58,13 @@ def process(file_path,ist,body,stats):
     letters = string.ascii_lowercase            # Ascii_lowercase contiene le lettere a-z
     freq_dict = {ch: 0 for ch in letters}       # Creo il dizionario con un loop su ch
 
-    for ch in data.lower():                     # Lower mette tutto minuscolo
-        if ch in letters:                       # Metto frequenze non normalizzate
-            freq_dict[ch] += 1                  # nel dizionario.
+    for char_dict in data.lower():                     # Lower mette tutto minuscolo
+        if char_dict in letters:                       # Metto frequenze non normalizzate
+            freq_dict[char_dict] += 1                  # nel dizionario.
 
     num_chars = float(sum(freq_dict.values()))  # Normalizzo solo su lettere conteggiate
-    for ch in letters:                          # Applico normalizzazione al dizionario
-        freq_dict[ch] /= num_chars
+    for char_dict in letters:                          # Applico normalizzazione al dizionario
+        freq_dict[char_dict] /= num_chars
 
     #######################
     #  Print the results  #
@@ -77,7 +79,7 @@ def process(file_path,ist,body,stats):
 
 
 if __name__ == '__main__':                      # Per fare un modulo con più librerie (mie)
-    parser = argparse.ArgumentParser(description=_description)
+    parser = argparse.ArgumentParser(description=_DESCRIPTION)
     parser.add_argument('infile', help='path to the input file')
     parser.add_argument('-i', '--ist', help='Add matplot istogram', action='store_true')
     parser.add_argument('-b', '--body', help='Extract the body of the book', action='store_true')
