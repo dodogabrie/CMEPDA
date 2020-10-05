@@ -42,8 +42,8 @@ def print_freq(freq_dict):
     for ch, freq in freq_dict.items():
         if freq*100. < 10:                      # Se la percentuale è minore di 10 serve uno spazio in più
             #   lettera: perc                   esempio: 5% = #####, la funzione ceil arrotonda.
-            print('{}: {:.3f}% '.format(ch, freq*100.), '#'*math.ceil( freq*100. - 0.5 ))
+            print(f'{ch}: {freq:.3%} ', '#'*math.ceil( freq*100. - 0.5 ))
         else:
-            print('{}: {:.3f}%'.format(ch, freq*100.), '#'*math.ceil( freq*100. - 0.5 ))
+            print(f'{ch}: {freq:.3%}', '#'*math.ceil( freq*100. - 0.5 ))
 
 
